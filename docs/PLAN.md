@@ -43,6 +43,25 @@ Model in-process callbacks/reentrancy and cooperating atomic writers. Explicitly
 - Fix only confirmed findings after writing them up with evidence. Make a small focused MONOLITH `main` commit with a regression test, run the full normal and sanitizer suites, pull with rebase before pushing, and link the fix commit from `FINDINGS.md`. Do not force-push or include unrelated changes.
 - If a fix is large or changes user-visible behavior, do not implement it. Add an OPEN DECISIONS entry with 2 to 4 options labeled A/B/C and one recommendation, then continue independent work.
 
+## Progress after the first model and harness pass (2026-10-22)
+
+- Phase 0 complete: baseline and audit foundation are committed.
+- Phase 1 complete for the recorded bounds: TLC exhausted the window lifecycle and atomic workspace models. The filesystem model has one writer and one cleaner, so it does not establish behavior under contention between multiple distinct writers.
+- Phase 2 first pass complete: actual terminal lexer and `.modr` source were checked with finite ASan/UBSan harnesses. CBMC 6.9.0 could not parse the lexer translation unit's GCC 11 standard library headers, so these results are bounded dynamic checks, not code-level proofs.
+- Phase 3 first pass complete: path helper checks and serial conditional-write cases passed. The atomic filesystem model states POSIX publication assumptions and excludes non-cooperating host writers. Broader operation/error interleavings remain follow-up work.
+- Phase 4 first pass complete: the abstract window model was traced to implementation methods and existing focused lifecycle tests passed in normal and sanitizer binaries. This is not a C++ refinement proof.
+- Phase 5 initial triage complete: no confirmed MONOLITH finding. See [FINDINGS.md](FINDINGS.md), [RESULTS.md](RESULTS.md), and the [assurance summary](05-assurance-summary.md).
+
 ## OPEN DECISIONS
 
-None currently. Add decisions only when the working rules require Daniel's choice.
+### 1. Multiple cooperating writers in the filesystem model
+
+The current finite model has one writer and one cleanup scanner. The parent lock is modeled with exclusive ownership, but two distinct writer lifecycles are not interleaved.
+
+A. Extend the model to two writer identities with separate workspaces contending for the shared publication lock. Recommended. This provides direct finite coverage of cooperating writer serialization, within a bounded two-writer model.
+
+B. Keep the current single-writer model and treat inter-writer serialization as a source-review and integration-test obligation.
+
+C. Leave multi-writer interleavings outside the formal model and state that limit in the final assurance summary.
+
+Recommendation: A. The model should exercise both writers reaching publication readiness and contending for the lock before treating cooperating-writer serialization as covered.

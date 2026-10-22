@@ -38,7 +38,10 @@ The sanitizer suite command compiles test executables under `BUILD_DIR`; the sep
 - [Tooling assessment](docs/03-tooling.md)
 - [Baseline results](docs/04-baseline-results.md)
 - [Plan and open decisions](docs/PLAN.md)
+- [Findings register](docs/FINDINGS.md)
+- [Results index](docs/RESULTS.md)
+- [Current assurance summary](docs/05-assurance-summary.md)
 
 ## Current status
 
-Run 1 is complete when its documentation is committed and pushed. No changes are made to the MONOLITH repository. Formal results will only be called proofs when a named tool discharges a stated property under recorded assumptions and bounds.
+The initial baseline run is complete. Subsequent audit work adds separately committed models and checks. The current pin remains MONOLITH `main` at `446e107efa466c47dbd5aa48333da1d7e879ede6`; no source changes have been made to MONOLITH. Formal results are called verified only when a named tool discharged a stated property under recorded assumptions and bounds.
