@@ -1,6 +1,6 @@
 # Plan
 
-This is a staged audit. The next run should follow the accepted open decisions below; run 1 only establishes the foundation and baseline.
+This is a staged audit. Phase 0 established the foundation and baseline. Decisions below were made by Daniel on 2026-10-22.
 
 ## Proposed phases
 
@@ -15,28 +15,34 @@ Cost estimates are rough Codex effort for the stated artifact, excluding tool in
 | 4. Window-manager refinement | Map the abstract lifecycle model to methods and callback paths in `WindowManager`; add invariant/property tests for small event traces, then check reentrancy transitions against the model. | L, 3-5 artifacts | 30k-50k tokens; 2-3 runs |
 | 5. Triage and report | Deduplicate counterexamples, classify confirmed issues versus assumptions/tool limitations, produce final assurance report, and prepare fixes only under the selected decision. | M, report + issue records | 18k-35k tokens; 1-2 runs |
 
+## DECIDED (2026-10-22)
+
+### 1. Tools and installation policy: A
+
+Install Clang Static Analyzer, ASan/UBSan, and TLC (plus a JRE if needed) locally into the audit repo's gitignored `tools/` directory. Smoke-test one local CBMC or ESBMC release and select one. Do not use sudo.
+
+### 2. Components for proof and lighter checking: A
+
+Use bounded code-level proofs for pure parser, codec, and path helpers. Use finite TLA+ models for filesystem publication/cleanup and window lifecycle. Use static analysis, fuzzing, sanitizers, and tests for the rest.
+
+### 3. Handling findings in MONOLITH: C
+
+Write the findings report in this audit repo first. Then fix confirmed findings directly on MONOLITH `main` (stable). A finding must be confirmed and recorded in `FINDINGS.md` with evidence before a fix begins.
+
+### 4. Model scope and assumptions: A
+
+Model in-process callbacks/reentrancy and cooperating atomic writers. Explicitly exclude non-cooperating host writers and state the POSIX publication assumptions.
+
+## Working rules
+
+- The target is MONOLITH `main` (stable), currently release `v1.0.1` at `446e107efa466c47dbd5aa48333da1d7e879ede6`. After any fix lands, re-pin to the new `main` commit and record it. Leave `beta` alone.
+- Work through phases in order. Commit and push each finished piece to audit `main` promptly. Do not batch completed work for a final push.
+- For every harness, model, or check, document the checked behavior, exact property, bounds, assumptions, reproducible command, tool version, and result.
+- Maintain [FINDINGS.md](FINDINGS.md) with finding ID, component, severity, evidence, and status; maintain [RESULTS.md](RESULTS.md) as the index of proved or checked work.
+- Be strict about proof language. Say “verified” only when a tool proved the property and state the bounds. Dynamic and static checks are not proofs.
+- Fix only confirmed findings after writing them up with evidence. Make a small focused MONOLITH `main` commit with a regression test, run the full normal and sanitizer suites, pull with rebase before pushing, and link the fix commit from `FINDINGS.md`. Do not force-push or include unrelated changes.
+- If a fix is large or changes user-visible behavior, do not implement it. Add an OPEN DECISIONS entry with 2 to 4 options labeled A/B/C and one recommendation, then continue independent work.
+
 ## OPEN DECISIONS
 
-### 1. Tool and installation policy
-
-- **A.** Use Clang Static Analyzer, ASan/UBSan, and TLC installed into ignored audit-local `tools/`; smoke-test one local CBMC or ESBMC release before selecting it. Do not use sudo. **Recommendation.** This is sufficient to start useful modeling and bounded helper checks without changing the host.
-- **B.** Approve sudo/system package installation for ESBMC or CBMC, `cppcheck`, and supporting dependencies; retain TLC local or packaged.
-- **C.** Use only currently installed tools and defer all model checking/bounded checking until a later environment is available.
-
-### 2. Components for real proofs versus lighter checking
-
-- **A.** Reserve code-level bounded proofs for pure parser/codec/path helpers; use finite TLA+ models for filesystem publication/cleanup and window lifecycle; use static analysis, fuzzing, sanitizers, and tests for the rest. **Recommendation.** It aligns tool strengths to tractable boundaries and avoids claims about external SDL/POSIX behavior.
-- **B.** Attempt bounded verification directly on the complete `Filesystem.cpp` and `WindowManager.cpp`, accepting harness abstraction and substantial modeling work.
-- **C.** Treat the audit as dynamic/static checking only and make no formal proof claims or model-checking artifacts.
-
-### 3. Handling later findings in MONOLITH
-
-- **A.** Report findings here first; after Daniel reviews them, implement approved fixes on a new topic branch based on `main`, with separate commits/PRs in MONOLITH. **Recommendation.** This keeps the audit evidence independent and protects `beta` while preserving a path to fixes.
-- **B.** Report findings only in this audit repository; do not change MONOLITH.
-- **C.** Fix confirmed findings directly on `beta` after an audit report is written.
-
-### 4. Model scope and assumptions
-
-- **A.** Model in-process callbacks/reentrancy and cooperating atomic writers; explicitly exclude non-cooperating host writers and model POSIX publication assumptions. **Recommendation.** This makes obligations checkable without hiding the documented external race.
-- **B.** Include adversarial host filesystem mutation between every check and publication step, even where the implementation documents that such writers do not honor its lock.
-- **C.** Treat all filesystem operations as atomic and ignore external writers in the model.
+None currently. Add decisions only when the working rules require Daniel's choice.
