@@ -1,0 +1,6 @@
+# Local copies of model checkers and their runtime dependencies.
+/tools/
+
+# Generated tool output and temporary counterexamples.
+/out/
+/results/tmp/
