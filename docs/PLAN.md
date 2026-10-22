@@ -31,7 +31,7 @@ Cost estimates are rough Codex effort for the stated artifact, excluding tool in
 
 ### 3. Handling later findings in MONOLITH
 
-- **A.** Report findings here first; after Daniel reviews them, implement approved fixes on a new topic branch based on `beta`, with separate commits/PRs in MONOLITH. **Recommendation.** This keeps the audit evidence independent and protects `beta` while preserving a path to fixes.
+- **A.** Report findings here first; after Daniel reviews them, implement approved fixes on a new topic branch based on `main`, with separate commits/PRs in MONOLITH. **Recommendation.** This keeps the audit evidence independent and protects `beta` while preserving a path to fixes.
 - **B.** Report findings only in this audit repository; do not change MONOLITH.
 - **C.** Fix confirmed findings directly on `beta` after an audit report is written.
 

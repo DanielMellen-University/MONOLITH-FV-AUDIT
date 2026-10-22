@@ -2,8 +2,11 @@
 
 ## Target and environment
 
-- Target repository branch: `beta`
+- Target repository branch: `main` (stable)
 - Target commit: `446e107efa466c47dbd5aa48333da1d7e879ede6`
+- Release tag: `v1.0.1` (peeled commit is the target commit above)
+- Baseline carry-over: `beta` pointed to the same commit when the baseline ran, so the recorded results apply to this stable pin.
+- Later re-pins follow MONOLITH `main` only.
 - Target checkout status: clean before and after the audit commands
 - Host: Linux x86_64, kernel `6.8.0-138-generic`
 - Compiler: GCC 11.4.0; Clang 14.0.0 also present

@@ -2,7 +2,7 @@
 
 ## Run 1 boundary
 
-The target is MONOLITH `beta` at `446e107efa466c47dbd5aa48333da1d7e879ede6` (2026-10-22 baseline). The project is a single-process C++23/SDL2 desktop application with a virtual filesystem and nine built-in apps. This run maps risk, names candidate properties, assesses local tooling, and captures reproducible build/test evidence. It does not change MONOLITH or claim proofs.
+The audit target is MONOLITH `main` (stable) at `446e107efa466c47dbd5aa48333da1d7e879ede6`, release tag `v1.0.1` (2026-10-22 baseline). At baseline time, `beta` pointed to that same commit, so the baseline results carry over unchanged. Later audit re-pins follow `main` only. The project is a single-process C++23/SDL2 desktop application with a virtual filesystem and nine built-in apps. This run maps risk, names candidate properties, assesses local tooling, and captures reproducible build/test evidence. It does not change MONOLITH or claim proofs.
 
 All audit documents, specifications, extracted harnesses, scripts, and reports are kept in this audit repository. Source builds and test outputs are placed outside the target checkout. The target is read-only for this audit.
 

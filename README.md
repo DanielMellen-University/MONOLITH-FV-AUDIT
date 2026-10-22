@@ -2,7 +2,7 @@
 
 This repository holds an independent assurance record for MONOLITH. The first run establishes scope, candidate properties, tool choices, and a reproducible baseline. It does not claim that MONOLITH has been formally verified.
 
-The audited source is pinned to MONOLITH `beta` commit `446e107efa466c47dbd5aa48333da1d7e879ede6` for this baseline. Audit artifacts, models, harnesses, scripts, and later results belong here. Build outputs belong in a scratch directory outside the MONOLITH checkout.
+The audit target is MONOLITH `main` (stable), commit `446e107efa466c47dbd5aa48333da1d7e879ede6`, release tag `v1.0.1`. When the baseline ran, `beta` pointed to the same commit, so its results carry over. Later audit re-pins follow `main` only. Audit artifacts, models, harnesses, scripts, and later results belong here. Build outputs belong in a scratch directory outside the MONOLITH checkout.
 
 ## Reproduce the baseline
 
