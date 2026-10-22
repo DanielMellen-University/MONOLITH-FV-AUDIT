@@ -19,7 +19,7 @@ Cost estimates are rough Codex effort for the stated artifact, excluding tool in
 
 ### 1. Tools and installation policy: A
 
-Install Clang Static Analyzer, ASan/UBSan, and TLC (plus a JRE if needed) locally into the audit repo's gitignored `tools/` directory. Smoke-test one local CBMC or ESBMC release and select one. Do not use sudo.
+Install Clang Static Analyzer, ASan/UBSan, and TLC locally into the audit repo's gitignored `tools/` directory; use a local JRE if needed. CBMC `6.9.0` is selected after a local C++ harness smoke check. Keep all tools local and do not use sudo.
 
 ### 2. Components for proof and lighter checking: A
 

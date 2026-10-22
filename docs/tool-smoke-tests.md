@@ -30,3 +30,20 @@ See [`specs/smoke/TLCSmoke.tla`](../specs/smoke/TLCSmoke.tla) and its config. Th
 - Assumptions: the TLA+ model is the entire object checked; it makes no claim about MONOLITH or its C++ implementation. TLC's state fingerprints are accepted for this smoke check.
 - Result: TLC reported `Model checking completed. No error has been found.` and exited 0. This invariant is verified for the stated finite model only.
 - Time box: under one second, no explicit timeout needed.
+
+## CBMC C++ assertion harness
+
+The harness is [`harnesses/tool-smoke/cbmc_index.cpp`](../harnesses/tool-smoke/cbmc_index.cpp). It is an isolated array-index normalization helper, not MONOLITH source.
+
+- Tool: CBMC `6.9.0` (`cbmc-6.9.0`), Ubuntu 22.04 amd64 package; host satisfies package runtime requirements. C++ mode is `--cpp11`.
+- Install command: `./scripts/install_cbmc.sh`.
+- Download source: `https://github.com/diffblue/cbmc/releases/download/cbmc-6.9.0/ubuntu-22.04-cbmc-6.9.0-Linux.deb`.
+- Package size: 70,032,526 bytes. Expected SHA-256 from GitHub release asset metadata and observed SHA-256: `5194e76aeff7d4bccc2351abe4b9229b3fca97297ffe685c973211987386db19`.
+- Version command: `tools/cbmc-6.9.0-root/usr/bin/cbmc --version`.
+- Reproduction command: `timeout 180s tools/cbmc-6.9.0-root/usr/bin/cbmc harnesses/tool-smoke/cbmc_index.cpp --cpp11 --bounds-check --pointer-check --unwind 5 --unwinding-assertions`.
+- Exact properties: for count 4 and assumed index in `[-1,4]`, `normalizeIndex` returns `-1` iff the index is outside `[0,4)`, otherwise returns the original index and a value in `[0,4)`. CBMC reported all three assertions successful.
+- Bounds: finite input domain `{-1,0,1,2,3,4}`; no loops exist in the harness or helper, so the unwind limit 5 is not reached. CBMC found no counterexample for those values and exited 0 with `VERIFICATION SUCCESSFUL`.
+- Assumptions: harness input is restricted by `__CPROVER_assume(index >= -1 && index <= count)`; count is fixed at 4; only the harness implementation is checked. No claim about MONOLITH has been established.
+- Time box: command was capped at 180 seconds and completed in under one second.
+- Installation location: ignored `tools/`, not committed. The `.deb` was extracted with `dpkg-deb`; no sudo or system package changes.
+- Frontend note: omitting `--cpp11` selected CBMC's default C++98 mode and failed to parse this harness. An initial declaration of `__CPROVER_nondet_int` also failed because CBMC treated it as a no-body function. The final harness uses an uninitialized local constrained by `__CPROVER_assume`.
