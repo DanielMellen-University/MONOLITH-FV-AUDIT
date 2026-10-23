@@ -1,6 +1,6 @@
 # MONOLITH Formal Verification Audit
 
-This repository holds an independent assurance record for MONOLITH. The first run establishes scope, candidate properties, tool choices, and a reproducible baseline. It does not claim that MONOLITH has been formally verified.
+This repository holds an independent, bounded assurance record for MONOLITH. The audit plan through Phase 5 is complete for the stated models, inputs, and test traces. It does not claim that MONOLITH has been formally verified.
 
 The audit target is MONOLITH `main` (stable), commit `446e107efa466c47dbd5aa48333da1d7e879ede6`, release tag `v1.0.1`. When the baseline ran, `beta` pointed to the same commit, so its results carry over. Later audit re-pins follow `main` only. Audit artifacts, models, harnesses, scripts, and later results belong here. Build outputs belong in a scratch directory outside the MONOLITH checkout.
 
@@ -37,11 +37,11 @@ The sanitizer suite command compiles test executables under `BUILD_DIR`; the sep
 - [Candidate properties](docs/02-properties.md)
 - [Tooling assessment](docs/03-tooling.md)
 - [Baseline results](docs/04-baseline-results.md)
-- [Plan and open decisions](docs/PLAN.md)
+- [Plan and phase status](docs/PLAN.md)
 - [Findings register](docs/FINDINGS.md)
 - [Results index](docs/RESULTS.md)
 - [Current assurance summary](docs/05-assurance-summary.md)
 
 ## Current status
 
-The initial baseline run is complete. Subsequent audit work adds separately committed models and checks. The current pin remains MONOLITH `main` at `446e107efa466c47dbd5aa48333da1d7e879ede6`; no source changes have been made to MONOLITH. Formal results are called verified only when a named tool discharged a stated property under recorded assumptions and bounds.
+Phases 0-5 are complete for the recorded bounds. The final triage found no confirmed MONOLITH defect; see [the findings register](docs/FINDINGS.md), [results index](docs/RESULTS.md), and [assurance summary](docs/05-assurance-summary.md). The current pin remains MONOLITH `main` at `446e107efa466c47dbd5aa48333da1d7e879ede6`; no source changes have been made to MONOLITH. Formal results are called verified only when a named tool discharged a stated property under recorded assumptions and bounds.

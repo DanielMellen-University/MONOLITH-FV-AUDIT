@@ -23,7 +23,7 @@ Install Clang Static Analyzer, ASan/UBSan, and TLC locally into the audit repo's
 
 ### 2. Components for proof and lighter checking: A
 
-Use bounded code-level proofs for pure parser, codec, and path helpers. Use finite TLA+ models for filesystem publication/cleanup and window lifecycle. Use static analysis, fuzzing, sanitizers, and tests for the rest.
+Attempt bounded code-level proofs for pure parser, codec, and path helpers where the checker supports the source. Use finite TLA+ models for filesystem publication/cleanup and window lifecycle. Use static analysis, fuzzing, sanitizers, and tests as complementary checks.
 
 ### 3. Handling findings in MONOLITH: C
 
@@ -32,6 +32,10 @@ Write the findings report in this audit repo first. Then fix confirmed findings 
 ### 4. Model scope and assumptions: A
 
 Model in-process callbacks/reentrancy and cooperating atomic writers. Explicitly exclude non-cooperating host writers and state the POSIX publication assumptions.
+
+### 5. Multiple cooperating writers in the filesystem model: A
+
+Extend the model to two writer identities with separate staged contents contending for a shared publication lock. Both writers reach readiness before lock acquisition is enabled. The resulting finite model and an actual two-process conditional-write race check are recorded in [the two-writer model report](../reports/atomic-writers.md) and [the writer race report](../reports/cooperating-writers.md).
 
 ## Working rules
 
@@ -43,25 +47,15 @@ Model in-process callbacks/reentrancy and cooperating atomic writers. Explicitly
 - Fix only confirmed findings after writing them up with evidence. Make a small focused MONOLITH `main` commit with a regression test, run the full normal and sanitizer suites, pull with rebase before pushing, and link the fix commit from `FINDINGS.md`. Do not force-push or include unrelated changes.
 - If a fix is large or changes user-visible behavior, do not implement it. Add an OPEN DECISIONS entry with 2 to 4 options labeled A/B/C and one recommendation, then continue independent work.
 
-## Progress after the first model and harness pass (2026-10-22)
+## Final phase status (2026-10-22)
 
-- Phase 0 complete: baseline and audit foundation are committed.
-- Phase 1 complete for the recorded bounds: TLC exhausted the window lifecycle and atomic workspace models. The filesystem model has one writer and one cleaner, so it does not establish behavior under contention between multiple distinct writers.
-- Phase 2 first pass complete: actual terminal lexer and `.modr` source were checked with finite ASan/UBSan harnesses. CBMC 6.9.0 could not parse the lexer translation unit's GCC 11 standard library headers, so these results are bounded dynamic checks, not code-level proofs.
-- Phase 3 first pass complete: path helper checks and serial conditional-write cases passed. The atomic filesystem model states POSIX publication assumptions and excludes non-cooperating host writers. Broader operation/error interleavings remain follow-up work.
-- Phase 4 first pass complete: the abstract window model was traced to implementation methods and existing focused lifecycle tests passed in normal and sanitizer binaries. This is not a C++ refinement proof.
-- Phase 5 initial triage complete: no confirmed MONOLITH finding. See [FINDINGS.md](FINDINGS.md), [RESULTS.md](RESULTS.md), and the [assurance summary](05-assurance-summary.md).
+- Phase 0 complete: scope, tools, source pin, baseline, and audit foundation are recorded; the initial foundation is committed.
+- Phase 1 complete for recorded bounds: TLC exhausted the window lifecycle, one-writer/one-cleaner workspace, and two-cooperating-writer models. These are abstract models, not proofs of C++ or POSIX behavior.
+- Phase 2 complete for recorded bounds: finite lexer and codec harnesses and bounded libFuzzer campaigns passed. CBMC `6.9.0` could not parse the actual lexer translation unit's GCC 11 standard-library headers, so no CBMC property was established for that source.
+- Phase 3 complete for recorded bounds: path contracts, serial conditional-write cases, and a coordinated two-process writer race passed. Syscall failures, crash/power-loss behavior, non-cooperating host writers, and arbitrary filesystem schedules remain outside the checks.
+- Phase 4 complete for recorded bounds: the abstract window model has a manual method/callback traceability review; focused lifecycle and focus tests passed in normal and sanitized binaries. This is not a C++ refinement proof.
+- Phase 5 complete: final triage identified no confirmed MONOLITH finding. Tool/runtime limitations are separated from source findings. See [FINDINGS.md](FINDINGS.md), [RESULTS.md](RESULTS.md), and the [assurance summary](05-assurance-summary.md).
 
 ## OPEN DECISIONS
 
-### 1. Multiple cooperating writers in the filesystem model
-
-The current finite model has one writer and one cleanup scanner. The parent lock is modeled with exclusive ownership, but two distinct writer lifecycles are not interleaved.
-
-A. Extend the model to two writer identities with separate workspaces contending for the shared publication lock. Recommended. This provides direct finite coverage of cooperating writer serialization, within a bounded two-writer model.
-
-B. Keep the current single-writer model and treat inter-writer serialization as a source-review and integration-test obligation.
-
-C. Leave multi-writer interleavings outside the formal model and state that limit in the final assurance summary.
-
-Recommendation: A. The model should exercise both writers reaching publication readiness and contending for the lock before treating cooperating-writer serialization as covered.
+None. All decisions required by this audit plan are recorded above. Residual verification limits are listed in the final assurance summary; they are not unresolved choices.
